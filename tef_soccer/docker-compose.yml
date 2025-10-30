@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    restart: always
+    container_name: fiware-mosquitto
+    hostname: mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+  posse-tracker:
+    build: .
+    container_name: tef_posse_tracker
+    command: ["python", 'ball_possession.py']
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    environment:
+      - BROKER_ADDRESS=mosquitto
+      - BROKER_PORT=1883
+  
+  gol_detector:
+    build: .
+    container_name: tef_gol_detector
+    command: ["python", "gol.py"]
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+      - posse-tracker
+    environment:
+      - BROKER_ADDRESS=mosquitto
+      - BROKER_PORT=1883
