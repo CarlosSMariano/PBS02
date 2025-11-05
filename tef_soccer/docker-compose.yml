@@ -11,18 +11,19 @@ services:
       - "9001:9001"
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
   posse-tracker:
     build: .
     container_name: tef_posse_tracker
-    command: ["python", 'ball_possession.py']
+    command: ["python", "ball_possession.py"]
     restart: unless-stopped
     depends_on:
       - mosquitto
     environment:
       - BROKER_ADDRESS=mosquitto
       - BROKER_PORT=1883
-  
-  gol-detector:
+
+  gol_detector:
     build: .
     container_name: tef_gol_detector
     command: ["python", "gol.py"]
@@ -40,12 +41,16 @@ services:
     restart: always
     ports:
       - "1880:1880"
+    user: "1000:1000"
     volumes:
-      - ./data:/data
+      - node_red_data:/data
     depends_on:
       - mosquitto
-      - gol-detector
       - posse-tracker
+      - gol_detector
     environment:
       - BROKER_ADDRESS=mosquitto
       - BROKER_PORT=1883
+
+volumes:
+  node_red_data:
