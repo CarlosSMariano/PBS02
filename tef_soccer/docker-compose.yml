@@ -33,3 +33,16 @@ services:
     environment:
       - BROKER_ADDRESS=mosquitto
       - BROKER_PORT=1883
+
+  nodered:
+    image: nodered/node-red:latest
+    container_name: node-red
+    restart: always
+    ports:
+      - "1880:1880"
+    volumes:
+      - ./data:/data
+    depends_on:
+      - mosquitto
+      - gol_detector
+      - posse_tracker
