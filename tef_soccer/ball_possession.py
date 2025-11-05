@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+import json
 import os
 from math import radians, cos, sqrt
 
@@ -183,7 +184,10 @@ def on_message(client, userdata, msg):
 
             # If player is close enough to the ball, publish event
             if distance <= d_tolerance:
-                payload = f"{soccer_team}, {soccer_name}"
+                payload = json.dumps({
+                    "team": soccer_team, 
+                    "player": soccer_name
+                })
                 client.publish(f"/TEF/application/last_touch", payload)
                 print(f"[DETECTED POSSESSION] Soccer player: {soccer_name} from {soccer_team}")
         except (ValueError, TypeError) as e: 

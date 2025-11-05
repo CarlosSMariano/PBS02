@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+import json
 import os
 from math import radians, cos, sqrt
 
@@ -99,25 +100,27 @@ def parse_metadata(data):
     Raises:
         ValueError: If metadata format is invalid
     """
-    parts = data.split(',')
+   
 
     # Validate format - must have exactly 2 parts (team, name)
-    if len(parts) != 2 : 
-        raise ValueError("Invalid metadata format!")
-
+  
     try: 
         # Extract team and player name
-        team = parts[0].strip()
-        name = parts[1].strip()
-    except (ValueError, IndexError):
-        print(f"[ERROR METADATA PARSE] Invalid Payload: {data}")
-        return None
+        metadata = json.loads(data)
+        team = metadata.get("team")
+        player = metadata.get("player")
+    except:
+        parts = data.split(',')
+        if len(parts) == 2:
+            team = parts[0].strip()
+            player = parts[1].strip()
+        else:
+            return None, None
     
-    # Handle empty values
-    if not team: team = None
-    if not name: name = None
-
-    return team, name
+    if not team or not player:
+        return None, None
+        
+    return team, player
 
 def on_connect(client, userdata, flags, rc):
     """
@@ -197,7 +200,11 @@ def on_message(client, userdata, msg):
 
             # If ball is close enough to the goal, publish goal event
             if distance <= d_tolerance:
-                payload = f"{soccer_team} ({soccer_name}) scored a goal" 
+                payload = json.dumps({
+                    "team": soccer_team,
+                    "player": soccer_name, 
+                    "type": "goal"  # ← Única diferença
+                })                
                 client.publish(f"/TEF/application/goal", payload)
                 print(f"[GOAL] {soccer_name} from {soccer_team} scored a goal")
         except (ValueError, TypeError) as e: 
