@@ -46,3 +46,6 @@ services:
       - mosquitto
       - gol_detector
       - posse_tracker
+    environment:
+      - BROKER_ADDRESS=mosquitto
+      - BROKER_PORT=1883
