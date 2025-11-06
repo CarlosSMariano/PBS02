@@ -1,54 +1,51 @@
 import { Footer } from "./components/Footer"
 import { Header } from "./components/Header"
 import gramado from "./assets/gramado.jpg"
-import { useEffect, useState, useCallback } from "react"
-import {PBS01Service} from "./service/PBS01Service"
+import { useEffect, useState} from "react"
 import { SoccerCard } from "./components/SoccerCard"
 
 function App() {
-  const [gameData, setGameData] = useState([])
-  const [golCorinthians, setGolCorinthians] = useState(0)
-  const [golFlamengo, setGolFlamengo] = useState(0)
-
-   const fetchLastTouch = useCallback(async () => {
-    try {
-      const data = await PBS01Service.getLastTouch()
-      setGameData(prev => [data])
-    } catch (error) {
-      console.error('Erro ao buscar último toque:', error)
-    }
-  }, [])
-
-  const fetchGol = useCallback(async () => {
-    try {
-      const data = await PBS01Service.getGol()
-      
-      if (data && data.type === 'gol') {
-        if (data.team.toLowerCase() === 'flamengo') {
-          setGolFlamengo(prev => prev + 1)
-        } else if (data.team.toLowerCase() === 'corinthians') {
-          setGolCorinthians(prev => prev + 1)
-        }
-        
-        setGameData(prev => [data])
-      }
-    } catch (error) {
-      console.error('Erro ao buscar gol:', error)
-    }
-  }, [])
+  const [gameData, setGameData] = useState([]);
+  const [golCorinthians, setGolCorinthians] = useState(0);
+  const [golFlamengo, setGolFlamengo] = useState(0);
+  const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    fetchGol()
-    fetchLastTouch()
-
-    const golInterval = setInterval(fetchGol, 5000)
-    const lastTouchInterval = setInterval(fetchLastTouch, 5000)
+    const websocket = new WebSocket('ws://ip do seu servidor aqui/ws');
+    
+    websocket.onopen = () => {
+      console.log('Conectado ao WebSocket');
+      setWs(websocket);
+    };
+    
+    websocket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('📥 Dados recebidos:', data);
+      
+      if (data.type === 'gol') {
+        setGameData([data]);
+        if (data.team.toLowerCase() === 'flamengo') {
+          setGolFlamengo(prev => prev + 1);
+        } else if (data.team.toLowerCase() === 'corinthians') {
+          setGolCorinthians(prev => prev + 1);
+        }
+      } else if (data.type === 'possession') {
+        setGameData([data]);
+      }
+    };
+    
+    websocket.onclose = () => {
+      console.log('WebSocket desconectado');
+    };
+    
+    websocket.onerror = (error) => {
+      console.error('Erro WebSocket:', error);
+    };
 
     return () => {
-      clearInterval(lastTouchInterval)
-      clearInterval(golInterval)
-    }
-  }, [fetchLastTouch, fetchGol])
+      websocket.close();
+    };
+  }, []);
 
   return (
     <>

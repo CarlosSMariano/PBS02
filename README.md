@@ -23,8 +23,8 @@ A **Synapse** desenvolveu uma solução acessível e eficiente que fornece dados
 1. **📡 Captura** → Coleta de coordenadas via dispositivos IoT
 2. **📨 MQTT** → Distribuição de mensagens em tempo real
 3. **🐍 Python** → Processamento e cálculos de proximidade
-4. **🟨 Node-RED** → Estruturação de dados e criação de APIs
-5. **⚛️ React** → Visualização em tempo real no frontend
+4. **🟨 Node-RED** → Estruturação de dados e WebSocket
+5. **⚛️ React** → Visualização em tempo real via WebSocket
 
 ### 🏗️ **Componentes Técnicos**
 
@@ -37,6 +37,31 @@ A **Synapse** desenvolveu uma solução acessível e eficiente que fornece dados
 - **Broker**: Mosquitto
 - **Protocolo**: MQTT para comunicação assíncrona
 - **Vantagens**: Baixa latência e eficiência em tempo real
+
+#### **🔌 WebSocket - Comunicação em Tempo Real**
+- **Protocolo**: WebSocket para atualizações instantâneas
+- **Funcionamento**: Conexão persistente bidirecional
+- **Vantagem**: Dados chegam instantaneamente sem necessidade de polling ou refresh
+
+**⚡ Como funciona o WebSocket:**
+```
+Cliente: "Olá, quero conexão WebSocket"
+Servidor: "Conexão estabelecida! ✅"
+
+[CONEXÃO PERMANECE ABERTA]
+
+Servidor: ⚽ "GOL do Corinthians!"
+[INSTANTÂNEO] → Cliente recebe e atualiza placar
+
+Servidor: 🔵 "Posse: Flamengo"  
+[INSTANTÂNEO] → Cliente recebe e mostra posse
+```
+
+**🎯 Benefícios para o Sistema:**
+- ✅ **Atualizações instantâneas** - Gols aparecem imediatamente
+- ✅ **Zero polling** - Não fica solicitando dados repetidamente
+- ✅ **Conexão eficiente** - Menos tráfego de rede
+- ✅ **Experiência real-time** - Como transmissões esportivas profissionais
 
 #### **🧮 Processamento Inteligente**
 
@@ -54,18 +79,18 @@ A **Synapse** desenvolveu uma solução acessível e eficiente que fornece dados
 **⚽ Detecção de Gol**
 - Cálculo de distância entre bola e gol
 - Identificação do último jogador com posse antes do gol
-- Publicação automática de evento de gol
+- Publicação automática de evento de gol via WebSocket
 
 #### **🐍 Processamento Python**
 - **Algoritmo Principal**: Cálculo de Proximidade Euclidiana
 - **Fórmula**: `√((x₂ - x₁)² + (y₂ - y₁)²)`
 - **Aplicação**: Posicionamento de jogadoras e análise de movimentos
 
-#### **🟨 Node-RED (API Layer)**
-- Conversão MQTT → HTTP
-- Criação de endpoints REST
+#### **🟨 Node-RED (WebSocket Layer)**
+- Conversão MQTT → WebSocket
 - Estruturação de dados em JSON
 - Gerenciamento de fluxo em tempo real
+- Broadcasting para todos os clientes conectados
 
 ---
 
@@ -77,8 +102,16 @@ A **Synapse** desenvolveu uma solução acessível e eficiente que fornece dados
 - ✅ **Transmissão de dados aprimorada** para maior confiabilidade
 - ✅ **Interface mais intuitiva** no frontend
 - ✅ **Processamento mais eficiente** de eventos em tempo real
-- ✅ **Mas simples e escalavel**
+- ✅ **Mais simples e escalável**
+- ✅ **WebSocket integrado** para atualizações em tempo real
+- ✅ **Eliminação completa do HTTP** para dados em tempo real
 
+### **🔄 Arquitetura Simplificada:**
+```
+Dispositivos IoT → MQTT → Python → Node-RED → [WebSocket] → React
+                                                      ↓
+                                         Atualização Instantânea
+```
 
 ---
 
@@ -119,6 +152,13 @@ npm install
 npm run dev
 ```
 
+### **🔌 Verificação do WebSocket**
+O frontend usa WebSocket automaticamente. Para verificar:
+
+1. **Abra o console do navegador** (F12)
+2. **Procure por:** `"✅ Conectado ao WebSocket"`
+3. **Teste o tempo real:** Faça um gol e veja a atualização instantânea sem refresh
+
 ### **🖼️ Configuração das Imagens**
 Caso não estejam aparecendo imagens das jogadoras:
 - Adicione as imagens na pasta `public`
@@ -158,7 +198,9 @@ Mensagem: -23.545556,-46.473889
 - 📈 Aumento na visibilidade do futebol feminino
 - 🔍 Análises de desempenho mais precisas
 - 💰 Atração de investimentos através de dados confiáveis
-- ⚡ Sistema em tempo real para tomada de decisão
+- ⚡ **Sistema 100% em tempo real** com WebSocket
+- 🚀 **Atualizações instantâneas** sem necessidade de refresh
+- 🔄 **Experiência de usuário fluida** como aplicativos profissionais
 
 ---
 

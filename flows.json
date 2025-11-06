@@ -1,5 +1,33 @@
 [
     {
+        "id": "e3d8a003b6e9a4ea",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "7923719ae757e308",
+        "type": "mqtt in",
+        "z": "e3d8a003b6e9a4ea",
+        "name": "Last_touch",
+        "topic": "/TEF/application/last_touch",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "a30c52d3bb29a35c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 100,
+        "wires": [
+            [
+                "fb87a1a20172211b"
+            ]
+        ]
+    },
+    {
         "id": "23de6b5e267812a6",
         "type": "mqtt in",
         "z": "e3d8a003b6e9a4ea",
@@ -21,10 +49,115 @@
         ]
     },
     {
+        "id": "fb87a1a20172211b",
+        "type": "change",
+        "z": "e3d8a003b6e9a4ea",
+        "name": "flow lastTouch",
+        "rules": [
+            {
+                "t": "set",
+                "p": "lastTouch",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 100,
+        "wires": [
+            [
+                "8d0a8bfb7df09324"
+            ]
+        ]
+    },
+    {
+        "id": "4d201093de0d9870",
+        "type": "change",
+        "z": "e3d8a003b6e9a4ea",
+        "name": "flow goal",
+        "rules": [
+            {
+                "t": "set",
+                "p": "goal",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 300,
+        "y": 240,
+        "wires": [
+            [
+                "9673a49e220f9659"
+            ]
+        ]
+    },
+    {
+        "id": "8d0a8bfb7df09324",
+        "type": "function",
+        "z": "e3d8a003b6e9a4ea",
+        "name": "function 1",
+        "func": "const lastTouch = flow.get(\"lastTouch\");\nconst stop = flow.get(\"stop\");\n\nif (stop || !lastTouch) {\n    node.log(\"LastTouch: Parado ou sem dados\");\n    return null;\n}\n\n// Processa lastTouch\ntry {\n    msg.payload = JSON.parse(lastTouch);\n    msg.payload.type = \"possession\";\n} catch (e) {\n    const parts = lastTouch.split(\",\");\n    msg.payload = {\n        team: parts[0].trim(),\n        soccer: parts[1].trim(),\n        type: \"possession\"\n    };\n}\n\nnode.log(\"LastTouch: Enviando via WebSocket\");\n// ENVIA para WebSocket (e mantém HTTP se quiser)\nreturn [msg, msg];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 100,
+        "wires": [
+            [
+                "e3558d0f18348d74"
+            ]
+        ]
+    },
+    {
+        "id": "9673a49e220f9659",
+        "type": "function",
+        "z": "e3d8a003b6e9a4ea",
+        "name": "function 2",
+        "func": "var golAtual = flow.get(\"goal\");\n\nif (golAtual && golAtual !== flow.get(\"ultimoGol\")) {\n    node.log(\"Gol: Novo gol detectado - enviando via WebSocket\");\n    flow.set(\"ultimoGol\", golAtual);\n\n    let msgGol = {};\n    try {\n        msgGol.payload = JSON.parse(golAtual);\n        msgGol.payload.type = 'gol';\n    } catch (e) {\n        const parts = golAtual.split(',');\n        msgGol.payload = {\n            team: parts[0].trim(),\n            soccer: parts[1].trim(),\n            type: \"gol\"\n        };\n    }\n\n    flow.set(\"stop\", true);\n    setTimeout(() => {\n        flow.set(\"stop\", false);\n        node.log(\"LastTouch liberado\");\n    }, 10000);\n\n    // ENVIA para WebSocket (e mantém HTTP se quiser)\n    return [msgGol, msgGol];\n}\n\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 240,
+        "wires": [
+            [
+                "e3558d0f18348d74"
+            ]
+        ]
+    },
+    {
+        "id": "e3558d0f18348d74",
+        "type": "websocket out",
+        "z": "e3d8a003b6e9a4ea",
+        "name": "",
+        "server": "b670ef3139a54e51",
+        "client": "",
+        "x": 760,
+        "y": 200,
+        "wires": []
+    },
+    {
         "id": "a30c52d3bb29a35c",
         "type": "mqtt-broker",
-        "name": "pb-brocker",
-        "broker": "seu servidor aqui",
+        "name": "seu brocker aqui",
+        "broker": "ip do seu servidor",
         "port": 1883,
         "clientid": "",
         "autoConnect": true,
@@ -50,5 +183,11 @@
         "willMsg": {},
         "userProps": "",
         "sessionExpiry": ""
+    },
+    {
+        "id": "b670ef3139a54e51",
+        "type": "websocket-listener",
+        "path": "/ws",
+        "wholemsg": "false"
     }
 ]
