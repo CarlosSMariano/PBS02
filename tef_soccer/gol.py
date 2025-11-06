@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import json
 import os
+import time
 from math import radians, cos, sqrt
 
 # MQTT Broker configuration parameters
@@ -16,6 +17,10 @@ CURRENT_STATE = {
 }
 
 d_tolerance = 1  # Distance tolerance in meters for goal detection
+
+# Variáveis de controle para debounce
+last_goal_time = 0
+goal_cooldown = 5  # segundos entre cada gol (evita múltiplos gols rapidamente)
 
 def euclidiane_distance(lat_a, lon_a, lat_b, lon_b):
     """
@@ -152,17 +157,20 @@ def update_state(topic, payload):
 
     # Handle coordinate updates for ball and goal devices
     if topic == '/TEF/device/b' or topic == '/TEF/device/g':
-        lat, lon = parse_coordinates(payload)
-        CURRENT_STATE[topic]['lat'] = lat
-        CURRENT_STATE[topic]['lon'] = lon
-        print(f"[{topic}] Update coordinates: '{lat}, {lon}'")
+        coordinates = parse_coordinates(payload)
+        if coordinates:
+            lat, lon = coordinates
+            CURRENT_STATE[topic]['lat'] = lat
+            CURRENT_STATE[topic]['lon'] = lon
+            print(f"[{topic}] Update coordinates: '{lat}, {lon}'")
 
     # Handle last_touch metadata updates
     if topic == '/TEF/application/last_touch':
         team, name = parse_metadata(payload)
-        CURRENT_STATE[topic]['team'] = team
-        CURRENT_STATE[topic]['soccer_name'] = name
-        print(f"[LAST TOUCH] Update last touch: {name} ({team})")
+        if team and name:
+            CURRENT_STATE[topic]['team'] = team
+            CURRENT_STATE[topic]['soccer_name'] = name
+            print(f"[LAST TOUCH] Update last touch: {name} ({team})")
 
 def on_message(client, userdata, msg):
     """
@@ -173,6 +181,7 @@ def on_message(client, userdata, msg):
         userdata: User-defined data
         msg: Message object containing topic and payload
     """
+    global last_goal_time
     
     topic = msg.topic
     try:
@@ -200,13 +209,19 @@ def on_message(client, userdata, msg):
 
             # If ball is close enough to the goal, publish goal event
             if distance <= d_tolerance:
-                payload = json.dumps({
-                    "team": soccer_team,
-                    "player": soccer_name, 
-                    "type": "goal"  # ← Única diferença
-                })                
-                client.publish(f"/TEF/application/goal", payload)
-                print(f"[GOAL] {soccer_name} from {soccer_team} scored a goal")
+                # Verifica se passou tempo suficiente desde o último gol
+                current_time = time.time()
+                if current_time - last_goal_time >= goal_cooldown:
+                    payload = json.dumps({
+                        "team": soccer_team,
+                        "player": soccer_name, 
+                        "type": "goal"
+                    })                
+                    client.publish(f"/TEF/application/goal", payload)
+                    last_goal_time = current_time  # Atualiza o tempo do último gol
+                    print(f"⚽ [GOAL] {soccer_name} from {soccer_team} scored a goal! (distance: {distance:.2f}m)")
+                else:
+                    print(f"⏳ [GOAL DEBOUNCED] Goal detected but too recent, skipping... ({(current_time - last_goal_time):.1f}s)")
         except (ValueError, TypeError) as e: 
             print(f"[MATH ERROR] Failed to convert or calculate distance: {e}")
 

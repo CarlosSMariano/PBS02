@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import json
 import os
+import time
 from math import radians, cos, sqrt
 
 # MQTT Broker configuration parameters
@@ -15,6 +16,10 @@ CURRENT_STATE = {
 }
 
 d_tolerance = 2  # Distance tolerance in meters for proximity detection
+
+# Variáveis de controle para debounce
+last_touch_time = 0
+touch_cooldown = 2  # segundos entre cada last_touch
 
 def euclidiane_distance(lat_a, lon_a, lat_b, lon_b):
     """
@@ -157,6 +162,7 @@ def on_message(client, userdata, msg):
         userdata: User-defined data
         msg: Message object containing topic and payload
     """
+    global last_touch_time
     
     topic = msg.topic
     try: 
@@ -184,12 +190,18 @@ def on_message(client, userdata, msg):
 
             # If player is close enough to the ball, publish event
             if distance <= d_tolerance:
-                payload = json.dumps({
-                    "team": soccer_team, 
-                    "player": soccer_name
-                })
-                client.publish(f"/TEF/application/last_touch", payload)
-                print(f"[DETECTED POSSESSION] Soccer player: {soccer_name} from {soccer_team}")
+                # Verifica se passou tempo suficiente desde o último touch
+                current_time = time.time()
+                if current_time - last_touch_time >= touch_cooldown:
+                    payload = json.dumps({
+                        "team": soccer_team, 
+                        "player": soccer_name
+                    })
+                    client.publish(f"/TEF/application/last_touch", payload)
+                    last_touch_time = current_time  # Atualiza o tempo
+                    print(f"[DETECTED POSSESSION] Soccer player: {soccer_name} from {soccer_team} (distance: {distance:.2f}m)")
+                else:
+                    print(f"[DEBOUNCED] Last touch too recent, skipping... ({(current_time - last_touch_time):.1f}s)")
         except (ValueError, TypeError) as e: 
             print(f"[MATH ERROR] Failed to convert or calculate distance: {e}")
 
