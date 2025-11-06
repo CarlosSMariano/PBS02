@@ -128,10 +128,10 @@ Caso não estejam aparecendo imagens das jogadoras:
 **📨 Tópicos para Teste:**
 ```
 Tópico: /TEF/device/sc
-Mensagem: -23.545556,-46.473889, Corinthians, gabi_zanotti
+Mensagem: -23.545556,-46.473889, Corinthians, zanotti
 
 Tópico: /TEF/device/sc
-Mensagem: -23.545551,-46.473885, Flamengo, fernanda_silva 
+Mensagem: -23.545551,-46.473885, Flamengo, fernanda 
 
 Tópico: /TEF/device/b  
 Mensagem: -23.545556,-46.473889
