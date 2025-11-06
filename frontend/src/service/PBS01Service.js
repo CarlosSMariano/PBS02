@@ -2,5 +2,5 @@ import { Api } from "./Api";
 
 export const PBS01Service = {
     getLastTouch: () => Api.request('/lastTouch'), 
-    getGol: () => Api.request('/gol')
+    getGol: () => Api.request('/goal')
 }

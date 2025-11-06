@@ -3,22 +3,32 @@ import { Header } from "./components/Header"
 import gramado from "./assets/gramado.jpg"
 import { useEffect, useState } from "react"
 import {PBS01Service} from "./service/PBS01Service"
+import { SoccerCard } from "./components/SoccerCard"
 
 function App() {
-  const [newsGame, setNewsGame] = useState([])
+  const [gameData, setGameData] = useState([])
+  const [golCorinthians, setGolCorinthians] = useState(0)
+  const [golFlamengo, setGolFlamengo] = useState(0)
+
 
   useEffect(() => {
     const fetchLastTouch = async () => {
       const data = await PBS01Service.getLastTouch()
-      setNewsGame(data)
+      setGameData([data])
     }
     const fetchGol = async () => {
       const data = await PBS01Service.getGol()
-      setNewsGame(data)
+       setGameData([data])
+
     }
 
     fetchLastTouch()
+    fetchGol()
   }, [])
+
+  
+
+  console.log(gameData)
 
   return (
     <>
@@ -38,7 +48,7 @@ function App() {
           {/* Corinthians - Lado Esquerdo */}
           <div className="text-center transform hover:scale-105 transition-transform duration-300">
             <h2 className='text-8xl lg:text-9xl leading-tight mb-4 font-bold text-red-600 drop-shadow-2xl'>
-              1
+              {golCorinthians}
             </h2>
             <h2 className='text-4xl lg:text-5xl font-bold font-quando tracking-wider text-white drop-shadow-lg'>
               Corinthians
@@ -47,12 +57,23 @@ function App() {
           </div>
 
           <div className="mx-12 drop-shadow-2xl">
-            x
+            {gameData && gameData.length > 0 ? gameData.map((g)=> (
+                 <SoccerCard 
+              team = {g.team}
+              name = {g.player}
+              type = {g.type}
+            />
+            )) : (
+              <p className="text-7xl lg:text-8xl font-black text-yellow-400 mx-12 drop-shadow-2xl animate-pulse">x</p>
+            )
+
+            }
+           
           </div>
 
           <div className="text-center transform hover:scale-105 transition-transform duration-300">
             <h2 className='text-8xl lg:text-9xl leading-tight mb-4 font-bold text-red-600 drop-shadow-2xl'>
-              0
+              {golFlamengo}
             </h2>
             <h2 className='text-4xl lg:text-5xl font-bold font-quando tracking-wider text-white drop-shadow-lg'>
               Flamengo
