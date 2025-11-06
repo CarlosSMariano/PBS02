@@ -1,4 +1,5 @@
 export const SoccerCard = (props) => {
+    console.log(props.type)
     return (
         <div className="w-full rounded-3xl hover:scale-105 transition-all duration-500 overflow-hidden text-center pb-6 bg-gradient-to-b from-gray-800 to-gray-900 flex flex-col justify-between shadow-2xl hover:shadow-yellow-500/20 border border-gray-600">
             <div className="text-center">
@@ -28,19 +29,16 @@ export const SoccerCard = (props) => {
                         {props.name}
                     </h2>
                     
-                    {props.type == 'possession' && (
-                        <p className="text-green-400 text-sm font-medium uppercase tracking-wide bg-green-400/10 px-3 py-1 rounded-full inline-block mb-3 border border-green-400/20">
-                            ⚽ Com a bola
-                        </p>
-                    )}
                     
-                    {props.type == 'gol' && (
+                    {props.type == 'gol' ? (
                         <div className="animate-pulse mt-3">
                             <p className="text-yellow-500 uppercase font-black text-xl tracking-widest bg-yellow-500/10 px-4 py-2 rounded-full border border-yellow-500/30">
                                 ⚽ GOOOOOOL!
                             </p>
                         </div>
-                    )}
+                    ):(<p className="text-green-400 text-sm font-medium uppercase tracking-wide bg-green-400/10 px-3 py-1 rounded-full inline-block mb-3 border border-green-400/20">
+                            ⚽ Com a bola
+                        </p>)}
                 </div>
             </div>
 

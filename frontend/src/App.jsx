@@ -1,7 +1,7 @@
 import { Footer } from "./components/Footer"
 import { Header } from "./components/Header"
 import gramado from "./assets/gramado.jpg"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import {PBS01Service} from "./service/PBS01Service"
 import { SoccerCard } from "./components/SoccerCard"
 
@@ -10,25 +10,45 @@ function App() {
   const [golCorinthians, setGolCorinthians] = useState(0)
   const [golFlamengo, setGolFlamengo] = useState(0)
 
-
-  useEffect(() => {
-    const fetchLastTouch = async () => {
+   const fetchLastTouch = useCallback(async () => {
+    try {
       const data = await PBS01Service.getLastTouch()
-      setGameData([data])
+      setGameData(prev => [data])
+    } catch (error) {
+      console.error('Erro ao buscar último toque:', error)
     }
-    const fetchGol = async () => {
-      const data = await PBS01Service.getGol()
-       setGameData([data])
-
-    }
-
-    fetchLastTouch()
-    fetchGol()
   }, [])
 
-  
+  const fetchGol = useCallback(async () => {
+    try {
+      const data = await PBS01Service.getGol()
+      
+      if (data && data.type === 'gol') {
+        if (data.team.toLowerCase() === 'flamengo') {
+          setGolFlamengo(prev => prev + 1)
+        } else if (data.team.toLowerCase() === 'corinthians') {
+          setGolCorinthians(prev => prev + 1)
+        }
+        
+        setGameData(prev => [data])
+      }
+    } catch (error) {
+      console.error('Erro ao buscar gol:', error)
+    }
+  }, [])
 
-  console.log(gameData)
+  useEffect(() => {
+    fetchGol()
+    fetchLastTouch()
+
+    const golInterval = setInterval(fetchGol, 5000)
+    const lastTouchInterval = setInterval(fetchLastTouch, 5000)
+
+    return () => {
+      clearInterval(lastTouchInterval)
+      clearInterval(golInterval)
+    }
+  }, [fetchLastTouch, fetchGol])
 
   return (
     <>
@@ -57,18 +77,16 @@ function App() {
           </div>
 
           <div className="mx-12 drop-shadow-2xl">
-            {gameData && gameData.length > 0 ? gameData.map((g)=> (
-                 <SoccerCard 
-              team = {g.team}
-              name = {g.player}
-              type = {g.type}
-            />
+            {gameData && gameData.length > 0 ? gameData.map((g, index) => (
+              <SoccerCard 
+                key={index}
+                team={g.team}
+                name={g.player}
+                type={g.type}
+              />
             )) : (
               <p className="text-7xl lg:text-8xl font-black text-yellow-400 mx-12 drop-shadow-2xl animate-pulse">x</p>
-            )
-
-            }
-           
+            )}
           </div>
 
           <div className="text-center transform hover:scale-105 transition-transform duration-300">
