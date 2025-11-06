@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+@theme {
+  --color-accent-2: #9747FF;
+  --color-accent: #B868E3;
+  --color-primary-2: #BC6FF1;
+  --color-secondary: #3C047C;
+  --color-secondary-2: #14002B;
+  --color-primary: #3C05C7;
+  --color-background: #F9F0FF;
+  --color-background-2: #BBACF3;
+  --color-background-3: #14002B;
+  --color-text: #100118;
+  --color-text-accent: #FC75AA;
+  --color-btn-accent: #E5599D;
+}
+
+.font-serif-display {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-quando {
+  font-family: 'Quando', serif;
+}
