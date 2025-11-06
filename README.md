@@ -77,6 +77,8 @@ A **Synapse** desenvolveu uma solução acessível e eficiente que fornece dados
 - ✅ **Transmissão de dados aprimorada** para maior confiabilidade
 - ✅ **Interface mais intuitiva** no frontend
 - ✅ **Processamento mais eficiente** de eventos em tempo real
+- ✅ **Mas simples e escalavel**
+
 
 ---
 
@@ -87,13 +89,23 @@ A **Synapse** desenvolveu uma solução acessível e eficiente que fornece dados
 - Docker-compose instalado
 
 ### **🚀 Execução do Sistema Backend**
-1. **Baixe a pasta `tef_soccer`** presente neste repositório
+1. **Baixe a pasta `tef_soccer`** presente neste repositório em sua vm
 2. **Execute os comandos:**
 ```bash
 cd tef_soccer
 sudo docker-compose up -d
 ```
 3. **Pronto!** O sistema backend está rodando
+
+### **⚙️ Configuração do Node-RED**
+1. **Acesse o Node-RED** no endereço: `http://seu-ip:1880`
+2. **Importe o fluxo:**
+   - Vá em Menu → Import
+   - Selecione o arquivo `flows.json` do repositório
+3. **Configure o Broker MQTT:**
+   - Abra as configurações dos nós MQTT
+   - Altere o IP do broker para o IP do seu servidor
+   - Clique em "Update" e depois "Deploy"
 
 ### **🌐 Execução do Frontend**
 1. **Clone o repositório** do frontend
@@ -112,7 +124,7 @@ Caso não estejam aparecendo imagens das jogadoras:
 - Adicione as imagens na pasta `public`
 - Nomeie os arquivos com letras minúsculas
 - Use o mesmo nome enviado pelo dispositivo
-- Formato: `.jpg` (ex: `joanasilva.jpg`)
+- Formato: `.jpg` (ex: `zanotti.jpg`, `fernanda.jpg`)
 
 ### **🧪 Teste do Sistema**
 
@@ -122,16 +134,16 @@ Caso não estejam aparecendo imagens das jogadoras:
 
 #### **Opção 2: Simulação via MyMQTT**
 - Baixe o aplicativo **MyMQTT** no celular
-- Conecte ao seu servidor MQTT
+- Conecte ao seu servidor MQTT (use o IP do seu servidor)
 - Envie coordenadas manualmente usando os tópicos:
 
 **📨 Tópicos para Teste:**
 ```
 Tópico: /TEF/device/sc
-Mensagem: -23.545556,-46.473889, Corinthians, zanotti
+Mensagem: -23.545556,-46.473889,Corinthians,zanotti
 
 Tópico: /TEF/device/sc
-Mensagem: -23.545551,-46.473885, Flamengo, fernanda 
+Mensagem: -23.545551,-46.473885,Flamengo,fernanda
 
 Tópico: /TEF/device/b  
 Mensagem: -23.545556,-46.473889
