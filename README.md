@@ -156,8 +156,7 @@ npm run dev
 O frontend usa WebSocket automaticamente. Para verificar:
 
 1. **Abra o console do navegador** (F12)
-2. **Procure por:** `"✅ Conectado ao WebSocket"`
-3. **Teste o tempo real:** Faça um gol e veja a atualização instantânea sem refresh
+2. **Procure por:** `"Conectado ao WebSocket"`
 
 ### **🖼️ Configuração das Imagens**
 Caso não estejam aparecendo imagens das jogadoras:
@@ -195,13 +194,37 @@ Mensagem: -23.545556,-46.473889
 ---
 
 ## 📊 **Resultados Esperados**
-- 📈 Aumento na visibilidade do futebol feminino
-- 🔍 Análises de desempenho mais precisas
-- 💰 Atração de investimentos através de dados confiáveis
-- ⚡ **Sistema 100% em tempo real** com WebSocket
-- 🚀 **Atualizações instantâneas** sem necessidade de refresh
-- 🔄 **Experiência de usuário fluida** como aplicativos profissionais
+
+### **🎯 Demonstração do Sistema em Funcionamento**
+
+#### **1. Acesso à Aplicação**
+<img src="./site.png" alt="Página inicial da aplicação Synapse" width="600">
+
+*A interface principal mostra o campo de futebol com visualização em tempo real das jogadoras, bola e estatísticas do jogo.*
+
+#### **2. Detecção de Posse de Bola**
+<img src="./posse.png" alt="Sistema detectando posse de bola" width="600">
+
+*Quando uma jogadora está a menos de 1,5m da bola, o sistema automaticamente:*
+- ✅ **Identifica a posse** com nome e time da jogadora
+- ✅ **Mostra visualmente** quem está com a posse
+
+#### **3. Detecção Automática de Gol**
+<img src="./gol.png" alt="Sistema detectando gol automaticamente" width="600">
+
+*Quando a bola entra no gol, o sistema instantaneamente:*
+- ⚽ **Identifica o gol** através do cálculo de proximidade
+- 👤 **Reconhece a artilheira** (última jogadora com posse)
+- 🎯 **Atualiza o placar** em tempo real via WebSocket
 
 ---
 
-*Sistema desenvolvido para a Sprint 4 - Ecossistema Tech PBS02*
+## 🏆 **Impacto e Conclusão**
+
+### **✅ Benefícios Alcançados**
+- **🎯 Maior visibilidade** do futebol feminino através de dados concretos
+- **📊 Análise profissional** acessível para clubes de todos os portes
+- **⚡ Tecnologia em tempo real** comparável a transmissões profissionais
+- **💰 Solução econômica** utilizando IoT e código aberto
+
+*Sistema desenvolvido para a Sprint 4 - Ecossistema Tech PBS02*  
