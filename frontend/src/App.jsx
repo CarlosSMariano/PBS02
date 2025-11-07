@@ -11,7 +11,7 @@ function App() {
   const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    const websocket = new WebSocket('ws://ip do seu servidor aqui/ws');
+    const websocket = new WebSocket('ws://ip do seu servidor aqui:porta aqui/ws');
     
     websocket.onopen = () => {
       console.log('Conectado ao WebSocket');
