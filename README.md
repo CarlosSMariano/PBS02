@@ -200,8 +200,6 @@ Mensagem: -23.545556,-46.473889
 #### **1. Acesso à Aplicação**
 <img src="./site.png" alt="Página inicial da aplicação Synapse" width="600">
 
-*A interface principal mostra o campo de futebol com visualização em tempo real das jogadoras, bola e estatísticas do jogo.*
-
 #### **2. Detecção de Posse de Bola**
 <img src="./posse.png" alt="Sistema detectando posse de bola" width="600">
 
